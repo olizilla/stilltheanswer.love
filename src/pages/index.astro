@@ -1,19 +1,40 @@
 ---
-import '../styles/global.css'
-import { Image } from 'astro:assets';
-import Logo from './dosmas.png'
+import '../styles/global.css';
+import Header from '../components/Header.astro';
+import Hero from '../components/Hero.astro';
+import MissionPillars from '../components/MissionPillars.astro';
+import StoryGlastonCherry from '../components/StoryGlastonCherry.astro';
+import StoryDogKennelHill from '../components/StoryDogKennelHill.astro';
+import DonateSection from '../components/DonateSection.astro';
+import Footer from '../components/Footer.astro';
 ---
 
-<html lang="en" class="min-h-full" style="background: #DE7440;">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/png" href="/lista-flag.png" />
-		<meta name="viewport" content="width=device-width" />
-		<title>Love is still the answer</title>
-	</head>
-	<body class="min-h-full">
-	<img src="/lista-flag.png" class="max-w-lg mx-auto mt-8" />
-		<!-- bg pink: #FFD9D9; <Image src={Logo} alt="Love is still the answer" class="max-w-2xl mx-auto"/>
-		<Image src={Logo} alt="Love is still the answer" class="max-w-2xl mx-auto"/> -->
-	</body>
+<html lang="en" class="scroll-smooth bg-[#FAF6F0] text-stone-900 antialiased">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" type="image/png" href="/lista-flag.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Love is still the answer — Intergenerational Community & Sound</title>
+    <meta 
+      name="description" 
+      content="Love is still the answer is a nonprofit organization using music, food, bonfires, and bubble machines to create beautiful intergenerational spaces." 
+    />
+
+    <!-- Open Graph tags for social sharing -->
+    <meta property="og:title" content="Love is still the answer" />
+    <meta property="og:description" content="Creating beautiful intergenerational spaces through music, food & magic." />
+    <meta property="og:image" content="/lista-flag.png" />
+    <meta property="og:type" content="website" />
+  </head>
+  <body class="min-h-screen flex flex-col font-sans selection:bg-[#EE4223] selection:text-white">
+    <Header />
+    <main class="flex-grow">
+      <Hero />
+      <StoryDogKennelHill />
+      <StoryGlastonCherry />
+      <!-- <MissionPillars /> -->
+      <DonateSection />
+    </main>
+    <Footer />
+  </body>
 </html>
