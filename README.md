@@ -1,6 +1,6 @@
 # stilltheanswer.love
 
-the website for Love Is Still The Answer (LISTA)
+The website for Love Is Still The Answer (LISTA)
 
 LISTA creates free community events that bring people together through live music, great food, and fundraising for local charities. Using the renowned hand-built Suena Bien Sound System and strong connections within the local music scene, we showcase talented emerging and established artists while supporting causes that make a positive difference in our communities.
 
