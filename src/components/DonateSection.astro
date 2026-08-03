@@ -10,10 +10,10 @@
         Support Our Work
       </span>
       <h2 class="font-serif text-5xl sm:text-6xl text-white tracking-tight mb-6">
-        Support Love is still the answer
+        Support Love Is Still The Answer
       </h2>
       <p class="text-stone-300 text-lg sm:text-xl font-light leading-relaxed text-pretty">
-        Love is still the answer is a non-profit organisation. We create free, inclusive community events powered by live music, great food, and fundraising for local charities and schools. Every contribution directly funds equipment, event logistics, and community feasts.
+        Love Is Still The Answer is a non-profit organisation. We create free, inclusive community events powered by music, great food, and fundraising for local charities and schools. Every contribution directly funds equipment, event logistics, and community feasts.
       </p>
     </div>
 
@@ -21,23 +21,13 @@
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-16">
       <div class="p-6 rounded-2xl bg-stone-800/80 border border-stone-700/80 flex flex-col justify-between">
         <div>
-          <span class="font-serif text-3xl text-[#FF8A73] block mb-2">£15</span>
+          <span class="font-serif text-3xl text-[#FF8A73] block mb-2">£20</span>
           <h3 class="font-medium text-white text-lg mb-2">Bonfire & Bubbles</h3>
           <p class="text-xs text-stone-400 font-light leading-relaxed">
             Covers firewood and bubble mixture for a neighbourhood twilight gathering.
           </p>
         </div>
       </div>
-
-      <!-- <div class="p-6 rounded-2xl bg-stone-800/80 border border-stone-700/80 flex flex-col justify-between">
-        <div>
-          <span class="font-serif text-3xl text-[#FF8A73] block mb-2">£30</span>
-          <h3 class="font-medium text-white text-lg mb-2">Community Feast</h3>
-          <p class="text-xs text-stone-400 font-light leading-relaxed">
-            Buys fresh, wholesome ingredients to cook a shared meal for up to 50 neighbours.
-          </p>
-        </div>
-      </div> -->
 
       <div class="p-6 rounded-2xl bg-stone-800/80 border border-stone-700/80 flex flex-col justify-between">
         <div>
@@ -61,56 +51,22 @@
     </div>
 
     <!-- Main Donation Card & Options -->
-    <!-- <div class="p-8 sm:p-12 rounded-3xl bg-stone-800 border border-stone-700 text-center max-w-2xl mx-auto shadow-2xl">
+    <div class="p-8 sm:p-12 rounded-3xl bg-stone-800 border border-stone-700 text-center max-w-2xl mx-auto shadow-2xl">
       <h3 class="font-serif text-3xl text-white mb-4">Make a Donation</h3>
       <p class="text-stone-300 text-sm font-light mb-8 max-w-md mx-auto">
-        Click below to support us online, or copy bank details for direct transfer.
+        Support our non-profit community work directly via our Collection Pot page.
       </p>
 
-      <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+      <div class="flex items-center justify-center">
         <a 
-          href="https://opencollective.com/" 
+          href="https://app.collectionpot.com/pot/loveisstilltheanswer" 
           target="_blank" 
           rel="noopener noreferrer"
-          class="w-full sm:w-auto px-8 py-4 rounded-full bg-[#EE4223] text-white font-medium hover:bg-[#D43417] transition-all shadow-lg text-center"
+          class="px-8 py-4 rounded-full bg-[#EE4223] text-white font-medium text-lg hover:bg-[#D43417] transition-all shadow-lg text-center"
         >
-          Donate Online →
+          Donate via Collection Pot →
         </a>
-        <button 
-          id="copy-bank-btn"
-          type="button"
-          class="w-full sm:w-auto px-8 py-4 rounded-full bg-stone-700 border border-stone-600 text-stone-200 font-medium hover:bg-stone-600 transition-colors text-center cursor-pointer"
-        >
-          Copy Bank Transfer Info
-        </button>
       </div>
-
-      <div id="copy-toast" class="hidden mt-4 p-3 rounded-xl bg-stone-900 text-emerald-400 text-xs font-medium">
-        ✓ Bank transfer details copied to clipboard!
-      </div>
-    </div> -->
+    </div>
   </div>
 </section>
-
-<script>
-  const copyBtn = document.getElementById('copy-bank-btn');
-  const copyToast = document.getElementById('copy-toast');
-
-  if (copyBtn && copyToast) {
-    copyBtn.addEventListener('click', () => {
-      const bankDetails = `Love is still the answer
-Account: 12345678
-Sort Code: 00-00-00
-Reference: LISTA Donation`;
-      
-      navigator.clipboard.writeText(bankDetails).then(() => {
-        copyToast.classList.remove('hidden');
-        setTimeout(() => {
-          copyToast.classList.add('hidden');
-        }, 4000);
-      }).catch(err => {
-        alert("Love is still the answer Bank Details:\n" + bankDetails);
-      });
-    });
-  }
-</script>
