@@ -1,4 +1,5 @@
 ---
+import { company } from '../config';
 ---
 <footer class="py-16 bg-[#FAF6F0] border-t border-stone-200/80 text-stone-700 text-sm">
   <div class="max-w-6xl mx-auto px-6">
@@ -15,13 +16,8 @@
       </div>
 
       <div class="flex items-center gap-6 text-stone-600 font-medium">
-        <a 
-          href="https://app.collectionpot.com/pot/loveisstilltheanswer" 
-          target="_blank" 
-          rel="noopener noreferrer" 
-          class="hover:text-[#EE4223] transition-colors"
-        >
-          Collection Pot ↗
+        <a href="#donate" class="hover:text-[#EE4223] transition-colors">
+          Donate
         </a>
         <a 
           href="https://suenabien.co/" 
@@ -38,5 +34,10 @@
       <p>© {new Date().getFullYear()} Love Is Still The Answer. All rights reserved.</p>
       <p class="text-stone-400">Strictly good vibes</p>
     </div>
+
+    <p class="mt-6 text-xs text-stone-500 font-light text-center sm:text-left">
+      {company.name} is a company limited by guarantee, registered in {company.registeredIn},
+      company number <a href={company.url} target="_blank" rel="noopener noreferrer" class="underline hover:text-[#EE4223]">{company.number}</a>.
+    </p>
   </div>
 </footer>

@@ -13,7 +13,7 @@ import Footer from '../components/Footer.astro';
     <meta charset="utf-8" />
     <link rel="icon" type="image/png" href="/lista-flag.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Love Is Still The Answer. Cooking, Community, Soundsytems, Good times</title>
+    <title>Love Is Still The Answer. Cooking, Community, Soundsystems, Good times</title>
     <meta 
       name="description" 
       content="Love Is Still The Answer is a nonprofit organization using music, food, bonfires, and bubble machines to create beautiful intergenerational events." 
@@ -22,7 +22,7 @@ import Footer from '../components/Footer.astro';
     <!-- Open Graph tags for social sharing -->
     <meta property="og:title" content="Love Is Still The Answer" />
     <meta property="og:description" content="Creating beautiful intergenerational spaces through music, food & magic." />
-    <meta property="og:image" content="/lista-flag.png" />
+    <meta property="og:image" content={`${Astro.url}lista-flag.png`} />
     <meta property="og:type" content="website" />
   </head>
   <body class="min-h-screen flex flex-col font-sans selection:bg-[#EE4223] selection:text-white">
@@ -31,7 +31,6 @@ import Footer from '../components/Footer.astro';
       <Hero />
       <StoryDogKennelHill />
       <StoryGlastonCherry />
-      <!-- <MissionPillars /> -->
       <DonateSection />
     </main>
     <Footer />

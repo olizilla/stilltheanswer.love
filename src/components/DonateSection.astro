@@ -1,4 +1,16 @@
 ---
+import { bank } from '../config';
+
+const bankRows = [
+  { label: 'Account name', value: bank.accountName },
+  { label: 'Sort code', value: bank.sortCode.replace(/(\d{2})(?=\d)/g, '$1-') },
+  { label: 'Account number', value: bank.accountNumber },
+  { label: 'Reference', value: bank.reference },
+];
+
+// One labelled line per field. Apps like Monzo pick the 6-digit sort code and
+// 8-digit account number out of pasted text, so keep other long numbers out.
+const allDetails = bankRows.map((row) => `${row.label}: ${row.value}`).join('\n');
 ---
 <section id="donate" class="py-24 bg-stone-900 text-stone-100 relative overflow-hidden">
   <!-- Subtle warm gradient glow -->
@@ -51,22 +63,59 @@
     </div>
 
     <!-- Main Donation Card & Options -->
-    <div class="p-8 sm:p-12 rounded-3xl bg-stone-800 border border-stone-700 text-center max-w-2xl mx-auto shadow-2xl">
+    <div class="p-6 sm:p-12 rounded-3xl bg-stone-800 border border-stone-700 text-center max-w-2xl mx-auto shadow-2xl">
       <h3 class="font-serif text-3xl text-white mb-4">Make a Donation</h3>
+
       <p class="text-stone-300 text-sm font-light mb-8 max-w-md mx-auto">
-        Support our non-profit community work directly via our Collection Pot page.
+        Donate by bank transfer: there are no fees, so every penny goes to the work. Tap a detail to select it, or copy them all at once.
       </p>
 
-      <div class="flex items-center justify-center">
-        <a 
-          href="https://app.collectionpot.com/pot/loveisstilltheanswer" 
-          target="_blank" 
-          rel="noopener noreferrer"
-          class="px-8 py-4 rounded-full bg-[#EE4223] text-white font-medium text-lg hover:bg-[#D43417] transition-all shadow-lg text-center"
-        >
-          Donate via Collection Pot →
-        </a>
-      </div>
+      <dl class="text-left divide-y divide-stone-700 rounded-2xl border border-stone-700 bg-stone-900/50">
+        {bankRows.map((row) => (
+          <div class="px-4 sm:px-5 py-3">
+            <dt class="text-xs uppercase tracking-wider text-stone-400">{row.label}</dt>
+            <dd class="text-white text-lg tabular-nums tracking-wide break-words select-all">{row.value}</dd>
+          </div>
+        ))}
+      </dl>
+
+      <button
+        type="button"
+        data-copy={allDetails}
+        class="mt-8 px-8 py-4 rounded-full bg-[#EE4223] text-white font-medium text-lg hover:bg-[#D43417] transition-all shadow-lg"
+      >
+        Copy all details
+      </button>
     </div>
   </div>
 </section>
+
+<script>
+  // Falls back to execCommand where the Clipboard API is unavailable or blocked.
+  async function copyText(text: string) {
+    try {
+      await navigator.clipboard.writeText(text);
+      return true;
+    } catch {
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      textarea.setAttribute('readonly', '');
+      textarea.style.position = 'fixed';
+      textarea.style.opacity = '0';
+      document.body.append(textarea);
+      textarea.select();
+      const copied = document.execCommand('copy');
+      textarea.remove();
+      return copied;
+    }
+  }
+
+  document.querySelectorAll<HTMLButtonElement>('button[data-copy]').forEach((button) => {
+    const label = button.textContent;
+    button.addEventListener('click', async () => {
+      const copied = await copyText(button.dataset.copy ?? '');
+      button.textContent = copied ? 'Copied' : 'Copy failed';
+      setTimeout(() => (button.textContent = label), 2000);
+    });
+  });
+</script>
