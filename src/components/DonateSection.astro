@@ -91,31 +91,7 @@ const allDetails = bankRows.map((row) => `${row.label}: ${row.value}`).join('\n'
 </section>
 
 <script>
-  // Falls back to execCommand where the Clipboard API is unavailable or blocked.
-  async function copyText(text: string) {
-    try {
-      await navigator.clipboard.writeText(text);
-      return true;
-    } catch {
-      const textarea = document.createElement('textarea');
-      textarea.value = text;
-      textarea.setAttribute('readonly', '');
-      textarea.style.position = 'fixed';
-      textarea.style.opacity = '0';
-      document.body.append(textarea);
-      textarea.select();
-      const copied = document.execCommand('copy');
-      textarea.remove();
-      return copied;
-    }
-  }
+  import { initCopyButtons } from '../scripts/copy';
 
-  document.querySelectorAll<HTMLButtonElement>('button[data-copy]').forEach((button) => {
-    const label = button.textContent;
-    button.addEventListener('click', async () => {
-      const copied = await copyText(button.dataset.copy ?? '');
-      button.textContent = copied ? 'Copied' : 'Copy failed';
-      setTimeout(() => (button.textContent = label), 2000);
-    });
-  });
+  initCopyButtons();
 </script>

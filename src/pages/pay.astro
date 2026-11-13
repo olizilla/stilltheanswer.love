@@ -1,0 +1,248 @@
+---
+import '../styles/global.css';
+import Footer from '../components/Footer.astro';
+import { bank, payOptions } from '../config';
+
+const sortCodeShown = bank.sortCode.replace(/(\d{2})(?=\d)/g, '$1-');
+
+// Shared Tailwind classes. Written out in full so Tailwind can see them.
+const focusRing = 'focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-[#FF8A73]';
+const copyButton = `shrink-0 min-w-28 h-12 px-3 rounded-full bg-white text-stone-900 text-base font-semibold whitespace-nowrap touch-manipulation hover:bg-stone-200 data-[state=copied]:bg-[#FF8A73] data-[state=failed]:bg-[#FF8A73] transition-colors ${focusRing}`;
+
+// Everything that differs between options is worked out here, so the markup
+// below is the same for each. Every option gets its own panel; a tiny script
+// shows the chosen one.
+const panels = payOptions.map((option) => {
+  // Fail the build, rather than ship a broken page, if config.ts is mistyped.
+  if (option.reference.length > 18) {
+    throw new Error(`Reference "${option.reference}" is over 18 characters (Faster Payments limit).`);
+  }
+  const cardLink = option.cardLink.trim();
+  if (cardLink && !cardLink.startsWith('https://')) {
+    throw new Error(`cardLink for "${option.id}" must start with https:// (or be empty to hide the button).`);
+  }
+
+  const fixedAmount = option.amount !== null;
+  const amountPlain = fixedAmount ? option.amount!.toFixed(2) : null; // 28.00, no £, for pasting
+
+  // copy: null means no Copy button on that row.
+  const rows = [
+    { label: 'Account name', value: bank.accountName, copy: bank.accountName },
+    { label: 'Sort code', value: sortCodeShown, copy: bank.sortCode }, // 6 digits, no dashes
+    { label: 'Account number', value: bank.accountNumber, copy: bank.accountNumber },
+    { label: 'Amount', value: fixedAmount ? `£${amountPlain}` : 'Any amount you like', copy: amountPlain },
+    { label: 'Reference', value: option.reference, copy: option.reference },
+  ];
+
+  // One labelled line per field, like the home page. Apps like Monzo pick the
+  // 6-digit sort code and 8-digit account number out of pasted text, so keep
+  // other long numbers out. The amount line only appears when it is fixed.
+  const allDetails = rows
+    .filter((row) => row.label !== 'Amount' || fixedAmount)
+    .map((row) => `${row.label}: ${row.value}`)
+    .join('\n');
+
+  const steps = [
+    'Open your banking app and add a new payee.',
+    'Paste in the details above. Tap Copy next to each one.',
+    fixedAmount ? 'Check the amount and reference, then send the payment.' : 'Type in any amount you like and send the payment.',
+    ...(option.afterPay ? [option.afterPay] : []),
+  ];
+
+  return { option, rows, allDetails, steps, cardLink };
+});
+---
+
+<html lang="en" class="bg-[#FAF6F0] text-stone-900 antialiased">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" type="image/png" href="/lista-flag.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Pay | Love Is Still The Answer</title>
+    <meta
+      name="description"
+      content="Pay Love Is Still The Answer by UK bank transfer or card. Buy a T-shirt or make a donation towards future free community events."
+    />
+    <!-- Without JavaScript the choice buttons do nothing, so show both options instead. -->
+    <noscript>
+      <style>
+        .js-only { display: none; }
+        [data-panel] { display: block; }
+      </style>
+    </noscript>
+  </head>
+  <body class="min-h-screen flex flex-col font-sans selection:bg-[#EE4223] selection:text-white">
+    <header class="bg-[#FAF6F0]">
+      <div class="max-w-xl mx-auto px-4 py-3">
+        <a
+          href="/"
+          class="inline-block py-1 rounded font-serif text-2xl tracking-wide text-stone-900 hover:text-[#EE4223] transition-colors focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-[#D43417]"
+        >
+          Love Is Still The Answer
+        </a>
+      </div>
+    </header>
+
+    <main class="grow relative overflow-hidden bg-stone-900 text-stone-100">
+      <!-- Subtle warm gradient glow -->
+      <div class="absolute inset-0 bg-gradient-to-tr from-[#DE7440]/20 via-transparent to-[#EE4223]/10 pointer-events-none"></div>
+
+      <div class="max-w-xl mx-auto px-4 py-10 sm:py-14 relative z-10">
+        <h1 class="font-serif text-4xl sm:text-5xl text-white tracking-tight text-balance mb-3">
+          Thank you for supporting LISTA
+        </h1>
+        <p class="text-stone-200 text-lg sm:text-xl leading-relaxed text-pretty mb-8">
+          Everything you pay goes towards our future free community events: live music, good food and a lot of love.
+        </p>
+
+        <!-- Real radio inputs (keyboard and screen reader friendly) styled as big buttons -->
+        <fieldset class="js-only mb-8">
+          <legend class="text-lg font-semibold text-white mb-3">What are you paying for?</legend>
+          <div class="grid grid-cols-2 gap-3">
+            {panels.map(({ option }, index) => (
+              <label class="group relative block cursor-pointer touch-manipulation">
+                <input
+                  type="radio"
+                  name="pay-option"
+                  value={option.id}
+                  checked={index === 0}
+                  class="peer sr-only"
+                />
+                <span class="block h-full rounded-2xl border-2 border-stone-600 bg-stone-800 px-3 py-5 text-center text-white transition-colors hover:border-stone-400 peer-checked:border-white peer-checked:bg-[#EE4223] peer-focus-visible:outline-4 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-[#FF8A73]">
+                  <span class="block font-serif text-3xl break-words">{option.label}</span>
+                  <span class="block mt-1 text-xl font-semibold">{option.summary}</span>
+                </span>
+                <!-- A tick as well as the colour, so the choice is clear in any light -->
+                <span
+                  aria-hidden="true"
+                  class="hidden group-has-[:checked]:flex absolute top-2 right-2 w-7 h-7 items-center justify-center rounded-full bg-white text-[#D43417] text-base font-bold"
+                >✓</span>
+              </label>
+            ))}
+          </div>
+        </fieldset>
+
+        {panels.map(({ option, rows, allDetails, steps, cardLink }, index) => (
+          <section data-panel={option.id} class={index === 0 ? undefined : 'hidden'} aria-label={`Pay for ${option.label}`}>
+            <!-- In person, tapping the card reader is quickest, so say so first -->
+            {option.atStall && (
+              <p class="mb-6 p-4 rounded-2xl border-2 border-[#FF8A73] text-lg sm:text-xl font-semibold text-white">
+                {option.atStall}
+              </p>
+            )}
+
+            <!-- Bank transfer -->
+            <div class="p-4 sm:p-6 rounded-3xl bg-stone-800 border border-stone-700 shadow-2xl">
+              <h2 class="font-serif text-3xl text-white">Pay by bank transfer</h2>
+              <p class="mt-1 text-lg font-semibold text-[#FF8A73]">No fees, so every penny goes to the work</p>
+
+              <dl class="mt-5 divide-y divide-stone-700 rounded-2xl border border-stone-700 bg-stone-900/50">
+                {rows.map((row) => (
+                  <div class="px-4 py-3">
+                    <dt class="text-sm font-semibold uppercase tracking-wider text-stone-300">{row.label}</dt>
+                    <dd class="mt-1 flex items-center justify-between gap-3">
+                      <span class="min-w-0 text-xl sm:text-2xl font-semibold text-white tabular-nums tracking-wide break-words select-all">{row.value}</span>
+                      {row.copy !== null && (
+                        <button type="button" data-copy={row.copy} data-copy-name={row.label} class={copyButton}>
+                          <span data-copy-label>Copy</span><span class="sr-only">{` ${row.label.toLowerCase()}`}</span>
+                        </button>
+                      )}
+                    </dd>
+                  </div>
+                ))}
+              </dl>
+
+              <button
+                type="button"
+                data-copy={allDetails}
+                data-copy-name="All details"
+                class={`mt-5 w-full h-16 rounded-full bg-[#EE4223] text-white font-semibold text-xl touch-manipulation hover:bg-[#D43417] data-[state=copied]:bg-[#D43417] data-[state=failed]:bg-[#D43417] transition-colors shadow-lg ${focusRing}`}
+              >
+                <span data-copy-label>Copy all details</span>
+              </button>
+            </div>
+
+            <!-- Steps -->
+            <div class="mt-6 px-1">
+              <h2 class="font-serif text-3xl text-white mb-4">How to pay</h2>
+              <ol class="space-y-4">
+                {steps.map((step, stepIndex) => (
+                  <li class="flex items-start gap-3 text-lg sm:text-xl text-stone-100">
+                    <span aria-hidden="true" class="shrink-0 w-9 h-9 rounded-full bg-[#EE4223]/20 text-[#FF8A73] font-bold flex items-center justify-center">{stepIndex + 1}</span>
+                    <span class="pt-0.5">{step}</span>
+                  </li>
+                ))}
+              </ol>
+            </div>
+
+            <!-- Card: the fallback, only when a payment link has been pasted into config.ts -->
+            {cardLink && (
+              <div class="mt-8 p-4 sm:p-6 rounded-3xl bg-stone-800 border border-stone-700 text-center">
+                <h2 class="font-serif text-3xl text-white mb-4">Prefer to pay by card?</h2>
+                <a
+                  href={cardLink}
+                  class={`block w-full rounded-full border-2 border-white px-4 py-3 text-white hover:bg-white hover:text-stone-900 transition-colors touch-manipulation ${focusRing}`}
+                >
+                  <span class="block text-xl font-semibold">Pay by card</span>
+                  <span class="block text-base">Apple Pay, Google Pay or any bank card</span>
+                </a>
+                <p class="mt-3 text-base text-stone-300">
+                  This opens our payment provider's secure page.
+                </p>
+              </div>
+            )}
+          </section>
+        ))}
+
+        <!-- Read out by screen readers when something is copied -->
+        <p id="copy-status" class="sr-only" role="status" aria-live="polite"></p>
+      </div>
+    </main>
+
+    <!-- The shared Footer is 2px too wide at 360px; clip it so the page cannot scroll sideways -->
+    <div class="overflow-x-clip">
+      <Footer />
+    </div>
+
+    <!--
+      Inline (not bundled) so the right option is showing before the page first
+      paints: /pay#donate must not flash the T-shirt. #tshirt and #donate pick
+      an option; tapping a choice updates the URL so a reload keeps it.
+    -->
+    <script is:inline>
+      (() => {
+        const radios = document.querySelectorAll('input[name="pay-option"]');
+        const panels = document.querySelectorAll('[data-panel]');
+
+        function show(id) {
+          const radio = [...radios].find((r) => r.value === id);
+          if (!radio) return false;
+          radio.checked = true;
+          panels.forEach((panel) => panel.classList.toggle('hidden', panel.dataset.panel !== id));
+          return true;
+        }
+
+        function fromHash() {
+          if (show(location.hash.slice(1))) return;
+          // No usable hash: match whatever the browser has ticked (e.g. restored on reload).
+          const ticked = document.querySelector('input[name="pay-option"]:checked');
+          if (ticked) show(ticked.value);
+        }
+
+        radios.forEach((radio) => {
+          radio.addEventListener('change', () => {
+            show(radio.value);
+            history.replaceState(null, '', '#' + radio.value);
+          });
+        });
+        addEventListener('hashchange', fromHash);
+        fromHash();
+      })();
+    </script>
+    <script>
+      import { initCopyButtons } from '../scripts/copy';
+
+      initCopyButtons();
+    </script>
+  </body>
+</html>
