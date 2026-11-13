@@ -16,9 +16,10 @@ const peach = '#FFC4AD';
 const ink = '#33251E';
 
 // Medium error correction copes with glare and a scuffed print. A 4-module
-// border is the quiet zone scanners expect. crispEdges stops hairline seams
-// between modules when the SVG is scaled up.
-const qrSvg = renderSVG(option.cardLink, { ecc: 'M', border: 4, whiteColor: peach, blackColor: ink }).replace(
+// border is the quiet zone scanners expect. The light modules are see-through,
+// so the code sits on peach on screen and on white paper in print. crispEdges
+// stops hairline seams between modules when the SVG is scaled up.
+const qrSvg = renderSVG(option.cardLink, { ecc: 'M', border: 4, whiteColor: 'none', blackColor: ink }).replace(
   '<svg ',
   `<svg shape-rendering="crispEdges" role="img" aria-label="QR code to pay ${option.summary} for a T-shirt by card" class="block w-full h-auto" `,
 );
@@ -82,21 +83,19 @@ const showTee = false;
 </html>
 
 <style is:global>
-  /* One full-bleed A4 sheet, like the field guide. Sizes in mm so it prints the
-     same from any browser; exact colours so the peach prints without having to
-     tick "background graphics". */
+  /* One A4 sheet on plain white paper (the peach is for screens only). Sizes in
+     mm so it prints the same from any browser. */
   @page {
     size: A4 portrait;
     margin: 0;
   }
 
   @media print {
-    html,
-    body.sign {
-      print-color-adjust: exact;
-      -webkit-print-color-adjust: exact;
+    html {
+      background: none; /* the site's cream, from global.css */
     }
     body.sign {
+      background: none !important; /* beats the inline screen colour */
       width: 210mm;
       height: 297mm;
       min-height: 0;
