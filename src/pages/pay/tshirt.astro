@@ -1,0 +1,129 @@
+---
+import { renderSVG } from 'uqr';
+import '../../styles/global.css';
+import { company, payOptions } from '../../config';
+
+// A sign for the stall, styled after the Suena Bien field guide: show it on a
+// screen, or print it on A4. The QR code opens the T-shirt card payment link.
+// It is drawn at build time, so nothing loads at runtime.
+const option = payOptions.find((o) => o.id === 'tshirt');
+if (!option?.cardLink) {
+  throw new Error('/pay/tshirt needs a cardLink for the "tshirt" option in src/config.ts.');
+}
+
+// Field guide colours.
+const peach = '#FFC4AD';
+const ink = '#33251E';
+
+// Medium error correction copes with glare and a scuffed print. A 4-module
+// border is the quiet zone scanners expect. crispEdges stops hairline seams
+// between modules when the SVG is scaled up.
+const qrSvg = renderSVG(option.cardLink, { ecc: 'M', border: 4, whiteColor: peach, blackColor: ink }).replace(
+  '<svg ',
+  `<svg shape-rendering="crispEdges" role="img" aria-label="QR code to pay ${option.summary} for a T-shirt by card" class="block w-full h-auto" `,
+);
+
+// The T-shirt photo is hidden for now: the sign is stronger without it.
+// Set to true to show it beside a smaller QR code.
+const showTee = false;
+---
+
+<html lang="en" class="antialiased">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" type="image/png" href="/suenabien.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <title>T-shirt {option.summary} | Suena Bien</title>
+  </head>
+  <body
+    class="sign min-h-svh flex flex-col items-center justify-center gap-4 px-4 py-6 text-center font-sans font-extrabold uppercase tracking-tight"
+    style={`background: ${peach}; color: ${ink};`}
+  >
+    <img src="/suenabien.png" alt="Suena Bien" width="801" height="801" class="logo w-[min(45vw,22svh)] h-auto" />
+
+    <h1 class="title font-sans text-5xl sm:text-6xl">{option.label} {option.summary}</h1>
+
+    <!-- With showTee, the T-shirt and the QR code sit side by side. The photo has
+         its own white background, so it sits on a white card rather than on peach. -->
+    {showTee ? (
+      <div class="row grid grid-cols-2 items-center gap-4 w-[min(92vw,70svh)]">
+        <div class="tee rounded-3xl bg-white p-2">
+          <img src="/suenabien-tee.jpg" alt="White T-shirt with the Suena Bien roundel on the back" width="918" height="1119" class="block w-full h-auto" />
+        </div>
+        <div class="qr">
+          <Fragment set:html={qrSvg} />
+        </div>
+      </div>
+    ) : (
+      <div class="qr qr-solo w-[min(80vw,44svh)]">
+        <Fragment set:html={qrSvg} />
+      </div>
+    )}
+
+    <p class="cta text-2xl sm:text-3xl">Scan to pay by card</p>
+
+    <p class="text-xs font-normal normal-case tracking-normal opacity-70 print:hidden">
+      {company.name}, company number {company.number}
+    </p>
+
+    <!-- Keep the screen on while this is showing at the stall. Not every browser supports it. -->
+    <script is:inline>
+      (() => {
+        if (!('wakeLock' in navigator)) return;
+        const keepAwake = () => navigator.wakeLock.request('screen').catch(() => {});
+        keepAwake();
+        document.addEventListener('visibilitychange', () => {
+          if (document.visibilityState === 'visible') keepAwake();
+        });
+      })();
+    </script>
+  </body>
+</html>
+
+<style is:global>
+  /* One full-bleed A4 sheet, like the field guide. Sizes in mm so it prints the
+     same from any browser; exact colours so the peach prints without having to
+     tick "background graphics". */
+  @page {
+    size: A4 portrait;
+    margin: 0;
+  }
+
+  @media print {
+    html,
+    body.sign {
+      print-color-adjust: exact;
+      -webkit-print-color-adjust: exact;
+    }
+    body.sign {
+      width: 210mm;
+      height: 297mm;
+      min-height: 0;
+      padding: 18mm;
+      gap: 9mm;
+      overflow: hidden;
+    }
+    .sign .logo {
+      width: 65mm;
+    }
+    .sign .title {
+      font-size: 52pt;
+      line-height: 1;
+    }
+    .sign .row {
+      width: 174mm;
+      gap: 8mm;
+    }
+    .sign .tee {
+      padding: 3mm;
+    }
+    .sign .qr-solo {
+      width: 125mm;
+    }
+    .sign .cta {
+      font-size: 26pt;
+      line-height: 1.1;
+    }
+  }
+</style>
